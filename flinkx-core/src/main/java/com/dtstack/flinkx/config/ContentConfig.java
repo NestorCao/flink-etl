@@ -18,6 +18,8 @@
 
 package com.dtstack.flinkx.config;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -30,15 +32,23 @@ public class ContentConfig extends AbstractConfig {
 
     public final static String KEY_READER_CONFIG = "reader";
     public final static String KEY_WRITER_CONFIG = "writer";
+    public final static String KEY_STEPS_CONFIG = "steps";
 
     ReaderConfig reader;
     WriterConfig writer;
-
+    List<StepConfig> steps;
     public ContentConfig(Map<String, Object> map) {
         super(map);
         if(map != null) {
             reader = new ReaderConfig((Map<String, Object>) map.get(KEY_READER_CONFIG));
             writer = new WriterConfig((Map<String, Object>) map.get(KEY_WRITER_CONFIG));
+            List<Map<String,Object>> stepList = (List<Map<String, Object>>) map.get(KEY_STEPS_CONFIG);
+            steps = new ArrayList<StepConfig>();
+            for(Map<String,Object> stepMap : stepList) {
+            	steps.add(new StepConfig(stepMap));
+            }
+            
+            
         }
     }
 
@@ -57,5 +67,7 @@ public class ContentConfig extends AbstractConfig {
     public void setWriter(WriterConfig writer) {
         this.writer = writer;
     }
-
+    public List<StepConfig> getSteps() {
+    	return steps;
+    }
 }

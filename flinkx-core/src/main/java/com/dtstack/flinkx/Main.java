@@ -25,6 +25,8 @@ import com.dtstack.flinkx.constants.ConfigConstant;
 import com.dtstack.flinkx.options.OptionParser;
 import com.dtstack.flinkx.reader.BaseDataReader;
 import com.dtstack.flinkx.reader.DataReaderFactory;
+import com.dtstack.flinkx.step.BaseStep;
+import com.dtstack.flinkx.step.StepFactory;
 import com.dtstack.flinkx.streaming.runtime.partitioner.CustomPartitioner;
 import com.dtstack.flinkx.util.ResultPrintUtil;
 import com.dtstack.flinkx.writer.BaseDataWriter;
@@ -87,7 +89,7 @@ public class Main {
         String monitor = options.getMonitor();
         String pluginRoot = options.getPluginRoot();
         String remotePluginPath = options.getRemotePluginPath();
-        String savepointPath = options.getS();
+        String savepointPath = options.getS(); 
         Properties confProperties = parseConf(options.getConfProp());
 
         // 解析jobPath指定的任务配置文件
@@ -132,7 +134,12 @@ public class Main {
         if (speedConfig.isRebalance()) {
             dataStream = dataStream.rebalance();
         }
-
+           
+        List<BaseStep> steps = StepFactory.getSteps(config);
+        for(BaseStep step : steps) {
+        	dataStream = step.run(dataStream);
+        }
+        
         BaseDataWriter dataWriter = DataWriterFactory.getDataWriter(config);
         DataStreamSink<?> dataStreamSink = dataWriter.writeData(dataStream);
 
