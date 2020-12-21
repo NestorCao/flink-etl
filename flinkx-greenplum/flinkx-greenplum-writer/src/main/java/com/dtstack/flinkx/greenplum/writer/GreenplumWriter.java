@@ -18,6 +18,7 @@
 
 package com.dtstack.flinkx.greenplum.writer;
 
+import com.alibaba.fastjson.JSONObject;
 import com.dtstack.flinkx.config.DataTransferConfig;
 import com.dtstack.flinkx.greenplum.format.GreenplumOutputFormat;
 import com.dtstack.flinkx.postgresql.PostgresqlTypeConverter;
@@ -59,7 +60,7 @@ public class GreenplumWriter extends JdbcDataWriter {
     }
 
     @Override
-    public DataStreamSink<?> writeData(DataStream<Row> dataSet) {
+    public DataStreamSink<?> writeData(DataStream<JSONObject> dataSet) {
         GreenplumOutputFormat greenplumOutputFormat = new GreenplumOutputFormat();
         JdbcOutputFormatBuilder builder = new JdbcOutputFormatBuilder(greenplumOutputFormat);
         builder.setDriverName(databaseInterface.getDriverClass());

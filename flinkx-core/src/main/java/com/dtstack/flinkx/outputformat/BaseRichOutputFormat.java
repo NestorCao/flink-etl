@@ -18,6 +18,7 @@
 
 package com.dtstack.flinkx.outputformat;
 
+import com.alibaba.fastjson.JSONObject;
 import com.dtstack.flinkx.config.RestoreConfig;
 import com.dtstack.flinkx.constants.Metrics;
 import com.dtstack.flinkx.exception.WriteRecordException;
@@ -61,7 +62,7 @@ import static com.dtstack.flinkx.writer.WriteErrorTypes.ERR_PRIMARY_CONFLICT;
  * Company: www.dtstack.com
  * @author huyifan.zju@163.com
  */
-public abstract class BaseRichOutputFormat extends org.apache.flink.api.common.io.RichOutputFormat<Row> implements CleanupWhenUnsuccessful {
+public abstract class BaseRichOutputFormat extends org.apache.flink.api.common.io.RichOutputFormat<JSONObject> implements CleanupWhenUnsuccessful {
 
     protected final Logger LOG = LoggerFactory.getLogger(getClass());
 
@@ -87,7 +88,7 @@ public abstract class BaseRichOutputFormat extends org.apache.flink.api.common.i
     protected int batchInterval = 1;
 
     /** 存储用于批量写入的数据 */
-    protected List<Row> rows = new ArrayList();
+    protected List<JSONObject> rows = new ArrayList();
 
     /** 总记录数 */
     protected LongCounter numWriteCounter;
@@ -331,7 +332,7 @@ public abstract class BaseRichOutputFormat extends org.apache.flink.api.common.i
 
     }
 
-    protected void writeSingleRecord(Row row) {
+    protected void writeSingleRecord(JSONObject row) {
         if(errorLimiter != null) {
             errorLimiter.acquire();
         }
@@ -363,7 +364,7 @@ public abstract class BaseRichOutputFormat extends org.apache.flink.api.common.i
         return false;
     }
 
-    private void saveErrorData(Row row, WriteRecordException e){
+    private void saveErrorData(JSONObject row, WriteRecordException e){
         errCounter.add(1);
 
         String errMsg = ExceptionUtil.getErrorMessage(e);
@@ -378,7 +379,7 @@ public abstract class BaseRichOutputFormat extends org.apache.flink.api.common.i
         }
     }
 
-    private void updateStatisticsOfDirtyData(Row row, WriteRecordException e){
+    private void updateStatisticsOfDirtyData(JSONObject row, WriteRecordException e){
         if(dirtyDataManager != null) {
             String errorType = dirtyDataManager.writeData(row, e);
             if (ERR_NULL_POINTER.equals(errorType)){
@@ -403,7 +404,7 @@ public abstract class BaseRichOutputFormat extends org.apache.flink.api.common.i
      * @param row 数据
      * @throws WriteRecordException
      */
-    protected abstract void writeSingleRecordInternal(Row row) throws WriteRecordException;
+    protected abstract void writeSingleRecordInternal(JSONObject row) throws WriteRecordException;
 
     protected void writeMultipleRecords() throws Exception {
         writeMultipleRecordsInternal();
@@ -439,12 +440,11 @@ public abstract class BaseRichOutputFormat extends org.apache.flink.api.common.i
     }
 
     @Override
-    public void writeRecord(Row row) throws IOException {
-        Row internalRow = setChannelInfo(row);
+    public void writeRecord(JSONObject row) throws IOException {
         if(batchInterval <= 1) {
-            writeSingleRecord(internalRow);
+            writeSingleRecord(row);
         } else {
-            rows.add(internalRow);
+            rows.add(row);
             if(rows.size() == batchInterval) {
                 writeRecordInternal();
             }
@@ -456,13 +456,11 @@ public abstract class BaseRichOutputFormat extends org.apache.flink.api.common.i
         }
     }
 
-    private Row setChannelInfo(Row row){
-        Row internalRow = new Row(row.getArity() - 1);
-        for (int i = 0; i < internalRow.getArity(); i++) {
-            internalRow.setField(i, row.getField(i));
-        }
-        return internalRow;
-    }
+	/*
+	 * private Row setChannelInfo(Row row){ Row internalRow = new Row(row.getArity()
+	 * - 1); for (int i = 0; i < internalRow.getArity(); i++) {
+	 * internalRow.setField(i, row.getField(i)); } return internalRow; }
+	 */
 
     @Override
     public void close() throws IOException {

@@ -17,6 +17,7 @@
  */
 package com.dtstack.flinkx.kafkabase.reader;
 
+import com.alibaba.fastjson.JSONObject;
 import com.dtstack.flinkx.decoder.DecodeEnum;
 import com.dtstack.flinkx.decoder.IDecode;
 import com.dtstack.flinkx.decoder.JsonDecoder;
@@ -52,7 +53,7 @@ public class KafkaBaseInputFormat extends BaseRichInputFormat {
     protected String encoding;
     protected Map<String, String> consumerSettings;
     protected volatile boolean running = false;
-    protected transient BlockingQueue<Row> queue;
+    protected transient BlockingQueue<JSONObject> queue;
     protected transient KafkaBaseConsumer consumer;
     protected transient IDecode decode;
 
@@ -75,7 +76,7 @@ public class KafkaBaseInputFormat extends BaseRichInputFormat {
     }
 
     @Override
-    protected Row nextRecordInternal(Row row) throws IOException {
+    protected JSONObject nextRecordInternal(JSONObject row) throws IOException {
         try {
             row = queue.take();
         } catch (InterruptedException e) {
@@ -93,9 +94,9 @@ public class KafkaBaseInputFormat extends BaseRichInputFormat {
         }
     }
 
-    public void processEvent(Map<String, Object> event) {
+    public void processEvent(JSONObject event) {
         try {
-            queue.put(Row.of(event));
+            queue.put(event);
         } catch (InterruptedException e) {
             LOG.error("takeEvent interrupted event:{} error:{}", event, e);
         }

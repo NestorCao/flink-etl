@@ -17,6 +17,7 @@
  */
 package com.dtstack.flinkx.kafkabase.writer;
 
+import com.alibaba.fastjson.JSONObject;
 import com.dtstack.flinkx.config.RestoreConfig;
 import com.dtstack.flinkx.decoder.JsonDecoder;
 import com.dtstack.flinkx.exception.WriteRecordException;
@@ -74,30 +75,10 @@ public class KafkaBaseOutputFormat extends BaseRichOutputFormat {
 
     @Override
     @SuppressWarnings("unchecked")
-    protected void writeSingleRecordInternal(Row row) throws WriteRecordException {
+    protected void writeSingleRecordInternal(JSONObject row) throws WriteRecordException {
         try {
-            Map<String, Object> map;
-            int arity = row.getArity();
-            if (tableFields != null && tableFields.size() >= arity) {
-                map = new LinkedHashMap<>((arity << 2) / 3);
-                for (int i = 0; i < arity; i++) {
-                    map.put(tableFields.get(i), org.apache.flink.util.StringUtils.arrayAwareToString(row.getField(i)));
-                }
-            } else {
-                if(arity == 1){
-                    Object obj = row.getField(0);
-                    if (obj instanceof Map) {
-                        map = (Map<String, Object>) obj;
-                    } else if (obj instanceof String) {
-                        map = jsonDecoder.decode(obj.toString());
-                    } else {
-                        map = Collections.singletonMap("message", row.toString());
-                    }
-                }else{
-                    map = Collections.singletonMap("message", row.toString());
-                }
-            }
-            emit(map);
+           
+            emit(row);
             //只要有正常的 重置为0
             failedTimes =0;
 
@@ -112,7 +93,7 @@ public class KafkaBaseOutputFormat extends BaseRichOutputFormat {
         }
     }
 
-    protected void emit(Map event) throws IOException {
+    protected void emit(JSONObject event) throws IOException {
         throw new RuntimeException("KafkaBaseOutputFormat.emit() should be override by subclass!");
     }
 

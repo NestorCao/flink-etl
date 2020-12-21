@@ -19,6 +19,8 @@ package com.dtstack.flinkx.decoder;
 
 import java.util.Map;
 
+import com.alibaba.fastjson.JSONObject;
+
 /**
  * Date: 2019/11/21
  * Company: www.dtstack.com
@@ -33,6 +35,6 @@ public interface IDecode {
      * @param message 待解码的内容
      * @return 解码后的数据
      */
-    Map<String, Object> decode(String message);
+    JSONObject decode(String message);
 
 }

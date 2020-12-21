@@ -17,6 +17,7 @@
  */
 package com.dtstack.flinkx.hive.writer;
 
+import com.alibaba.fastjson.JSONObject;
 import com.dtstack.flinkx.config.DataTransferConfig;
 import com.dtstack.flinkx.config.WriterConfig;
 import com.dtstack.flinkx.constants.ConstantValue;
@@ -196,7 +197,7 @@ public class HiveWriter extends BaseDataWriter {
     }
 
     @Override
-    public DataStreamSink<?> writeData(DataStream<Row> dataSet) {
+    public DataStreamSink<?> writeData(DataStream<JSONObject> dataSet) {
         HiveOutputFormatBuilder builder = new HiveOutputFormatBuilder();
         builder.setHadoopConfig(hadoopConfig);
         builder.setDefaultFs(defaultFs);

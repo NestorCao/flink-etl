@@ -17,6 +17,7 @@
  */
 package com.dtstack.flinkx;
 
+import com.alibaba.fastjson.JSONObject;
 import com.dtstack.flink.api.java.MyLocalStreamEnvironment;
 import com.dtstack.flinkx.classloader.ClassLoaderManager;
 import com.dtstack.flinkx.config.ContentConfig;
@@ -122,9 +123,9 @@ public class Main {
         env.setRestartStrategy(RestartStrategies.noRestart());
 
         BaseDataReader dataReader = DataReaderFactory.getDataReader(config, env);
-        DataStream<Row> dataStream = dataReader.readData();
+        DataStream<JSONObject> dataStream = dataReader.readData();
         if(speedConfig.getReaderChannel() > 0){
-            dataStream = ((DataStreamSource<Row>) dataStream).setParallelism(speedConfig.getReaderChannel());
+            dataStream = ((DataStreamSource<JSONObject>) dataStream).setParallelism(speedConfig.getReaderChannel());
         }
 
         if (speedConfig.isRebalance()) {

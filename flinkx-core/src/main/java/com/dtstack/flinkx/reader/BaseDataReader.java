@@ -18,6 +18,7 @@
 
 package com.dtstack.flinkx.reader;
 
+import com.alibaba.fastjson.JSONObject;
 import com.dtstack.flinkx.config.DataTransferConfig;
 import com.dtstack.flinkx.config.LogConfig;
 import com.dtstack.flinkx.config.RestoreConfig;
@@ -30,9 +31,9 @@ import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import com.dtstack.flinkx.streaming.api.functions.source.DtInputFormatSourceFunction;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-import org.apache.flink.types.Row;
 import org.apache.flink.util.Preconditions;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.JsonObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -129,10 +130,10 @@ public abstract class BaseDataReader {
      *
      * @return DataStream
      */
-    public abstract DataStream<Row> readData();
+    public abstract DataStream<JSONObject> readData();
 
     @SuppressWarnings("unchecked")
-    protected DataStream<Row> createInput(InputFormat inputFormat, String sourceName) {
+    protected DataStream<JSONObject> createInput(InputFormat inputFormat, String sourceName) {
         Preconditions.checkNotNull(sourceName);
         Preconditions.checkNotNull(inputFormat);
         TypeInformation typeInfo = TypeExtractor.getInputFormatTypes(inputFormat);
@@ -140,7 +141,7 @@ public abstract class BaseDataReader {
         return env.addSource(function, sourceName, typeInfo);
     }
 
-    protected DataStream<Row> createInput(InputFormat inputFormat) {
+    protected DataStream<JSONObject> createInput(InputFormat inputFormat) {
         return createInput(inputFormat,this.getClass().getSimpleName().toLowerCase());
     }
 

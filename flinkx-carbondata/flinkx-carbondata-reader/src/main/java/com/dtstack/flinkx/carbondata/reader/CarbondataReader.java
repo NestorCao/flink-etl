@@ -17,6 +17,7 @@
  */
 package com.dtstack.flinkx.carbondata.reader;
 
+import com.alibaba.fastjson.JSONObject;
 import com.dtstack.flinkx.carbondata.CarbonConfigKeys;
 import com.dtstack.flinkx.config.DataTransferConfig;
 import com.dtstack.flinkx.config.ReaderConfig;
@@ -93,7 +94,7 @@ public class CarbondataReader extends BaseDataReader {
     }
 
     @Override
-    public DataStream<Row> readData() {
+    public DataStream<JSONObject> readData() {
         CarbondataInputFormatBuilder builder = new CarbondataInputFormatBuilder();
         builder.setDataTransferConfig(dataTransferConfig);
         builder.setColumnNames(columnName);

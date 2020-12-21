@@ -19,6 +19,7 @@
 
 package com.dtstack.flinkx.outputformat;
 
+import com.alibaba.fastjson.JSONObject;
 import com.dtstack.flinkx.exception.WriteRecordException;
 import com.dtstack.flinkx.restore.FormatState;
 import com.dtstack.flinkx.util.ExceptionUtil;
@@ -165,11 +166,11 @@ public abstract class BaseFileOutputFormat extends BaseRichOutputFormat {
     }
 
     @Override
-    public void writeSingleRecordInternal(Row row) throws WriteRecordException {
+    public void writeSingleRecordInternal(JSONObject row) throws WriteRecordException {
         if (restoreConfig.isRestore() && !restoreConfig.isStream()){
             if(lastRow != null){
                 readyCheckpoint = !ObjectUtils.equals(lastRow.getField(restoreConfig.getRestoreColumnIndex()),
-                        row.getField(restoreConfig.getRestoreColumnIndex()));
+                        row.get(restoreConfig.getRestoreColumnIndex()));
             }
         }
 
@@ -382,7 +383,7 @@ public abstract class BaseFileOutputFormat extends BaseRichOutputFormat {
      * @param row 要写入的数据
      * @throws WriteRecordException 脏数据异常
      */
-    protected abstract void writeSingleRecordToFile(Row row) throws WriteRecordException;
+    protected abstract void writeSingleRecordToFile(JSONObject row) throws WriteRecordException;
 
     /**
      * 每个通道写完数据后关闭资源前创建结束标制

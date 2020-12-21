@@ -1,5 +1,6 @@
 package com.dtstack.flinkx.emqx.reader;
 
+import com.alibaba.fastjson.JSONObject;
 import com.dtstack.flinkx.config.DataTransferConfig;
 import com.dtstack.flinkx.config.ReaderConfig;
 import com.dtstack.flinkx.emqx.format.EmqxInputFormatBuilder;
@@ -45,7 +46,7 @@ public class EmqxReader extends BaseDataReader {
     }
 
     @Override
-    public DataStream<Row> readData() {
+    public DataStream<JSONObject> readData() {
         EmqxInputFormatBuilder builder = new EmqxInputFormatBuilder();
         builder.setDataTransferConfig(dataTransferConfig);
         builder.setBroker(broker);

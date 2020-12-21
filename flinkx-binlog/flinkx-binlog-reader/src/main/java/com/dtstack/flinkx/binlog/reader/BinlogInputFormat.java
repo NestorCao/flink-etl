@@ -17,6 +17,7 @@
  */
 package com.dtstack.flinkx.binlog.reader;
 
+import com.alibaba.fastjson.JSONObject;
 import com.alibaba.otter.canal.filter.aviater.AviaterRegexFilter;
 import com.alibaba.otter.canal.parse.inbound.mysql.MysqlEventParser;
 import com.alibaba.otter.canal.parse.support.AuthenticationInfo;
@@ -223,7 +224,7 @@ public class BinlogInputFormat extends BaseRichInputFormat {
     }
 
     @Override
-    protected Row nextRecordInternal(Row row) throws IOException {
+    protected JSONObject nextRecordInternal(JSONObject row) throws IOException {
         if (binlogEventSink != null) {
             return binlogEventSink.takeEvent();
         }

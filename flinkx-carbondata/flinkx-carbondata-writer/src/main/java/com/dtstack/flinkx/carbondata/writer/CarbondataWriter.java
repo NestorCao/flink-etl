@@ -18,6 +18,7 @@
 package com.dtstack.flinkx.carbondata.writer;
 
 
+import com.alibaba.fastjson.JSONObject;
 import com.dtstack.flinkx.carbondata.CarbonConfigKeys;
 import com.dtstack.flinkx.config.DataTransferConfig;
 import com.dtstack.flinkx.config.WriterConfig;
@@ -70,7 +71,7 @@ public class CarbondataWriter extends BaseDataWriter {
     }
 
     @Override
-    public DataStreamSink<?> writeData(DataStream<Row> dataSet) {
+    public DataStreamSink<?> writeData(DataStream<JSONObject> dataSet) {
         CarbondataOutputFormatBuilder builder = new CarbondataOutputFormatBuilder();
         builder.setWriteMode(mode);
         builder.setPartition(partition);

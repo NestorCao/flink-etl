@@ -18,6 +18,7 @@
 
 package com.dtstack.flinkx.writer;
 
+import com.alibaba.fastjson.JSONObject;
 import com.dtstack.flinkx.config.DataTransferConfig;
 import com.dtstack.flinkx.config.DirtyConfig;
 import com.dtstack.flinkx.config.RestoreConfig;
@@ -159,7 +160,7 @@ public abstract class BaseDataWriter {
      * @param dataSet read data flow
      * @return write data flow
      */
-    public abstract DataStreamSink<?> writeData(DataStream<Row> dataSet);
+    public abstract DataStreamSink<?> writeData(DataStream<JSONObject> dataSet);
 
     @SuppressWarnings("unchecked")
     protected DataStreamSink<?> createOutput(DataStream<?> dataSet, OutputFormat outputFormat, String sinkName) {

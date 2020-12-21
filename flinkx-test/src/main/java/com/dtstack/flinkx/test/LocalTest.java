@@ -19,6 +19,8 @@ package com.dtstack.flinkx.test;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.LoggerContext;
+
+import com.alibaba.fastjson.JSONObject;
 import com.dtstack.flink.api.java.MyLocalStreamEnvironment;
 import com.dtstack.flinkx.binlog.reader.BinlogReader;
 import com.dtstack.flinkx.carbondata.reader.CarbondataReader;
@@ -160,10 +162,10 @@ public class LocalTest {
         }
 
         BaseDataReader reader = buildDataReader(config, env);
-        DataStream<Row> dataStream = reader.readData();
+        DataStream<JSONObject> dataStream = reader.readData();
         SpeedConfig speedConfig = config.getJob().getSetting().getSpeed();
         if (speedConfig.getReaderChannel() > 0) {
-            dataStream = ((DataStreamSource<Row>) dataStream).setParallelism(speedConfig.getReaderChannel());
+            dataStream = ((DataStreamSource<JSONObject>) dataStream).setParallelism(speedConfig.getReaderChannel());
         }
 
         if (speedConfig.isRebalance()) {

@@ -18,6 +18,7 @@
 
 package com.dtstack.flinkx.es.writer;
 
+import com.alibaba.fastjson.JSONObject;
 import com.dtstack.flinkx.config.DataTransferConfig;
 import com.dtstack.flinkx.config.WriterConfig;
 import com.dtstack.flinkx.es.EsConfigKeys;
@@ -107,7 +108,7 @@ public class EsWriter extends BaseDataWriter {
     }
 
     @Override
-    public DataStreamSink<?> writeData(DataStream<Row> dataSet) {
+    public DataStreamSink<?> writeData(DataStream<JSONObject> dataSet) {
         EsOutputFormatBuilder builder = new EsOutputFormatBuilder();
         builder.setAddress(address);
         builder.setUsername(username);

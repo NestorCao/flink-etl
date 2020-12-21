@@ -17,6 +17,7 @@
  */
 package com.dtstack.flinkx.decoder;
 
+import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,16 +38,13 @@ public class JsonDecoder implements IDecode {
 
     @Override
     @SuppressWarnings("unchecked")
-    public Map<String, Object> decode(final String message) {
+    public JSONObject decode(final String message) {
         try {
-            Map<String, Object> event = objectMapper.readValue(message, Map.class);
-            if (!event.containsKey(KEY_MESSAGE)) {
-                event.put(KEY_MESSAGE, message);
-            }
-            return event;
+            return JSONObject.parseObject(message);
+            
         } catch (Exception e) {
             LOG.error(e.getMessage());
-            return Collections.singletonMap(KEY_MESSAGE, message);
+            return null;
         }
     }
 }

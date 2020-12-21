@@ -18,6 +18,7 @@
 
 package com.dtstack.flinkx.es.reader;
 
+import com.alibaba.fastjson.JSONObject;
 import com.dtstack.flinkx.es.EsUtil;
 import com.dtstack.flinkx.inputformat.BaseRichInputFormat;
 import com.google.common.collect.Lists;
@@ -77,7 +78,7 @@ public class EsInputFormat extends BaseRichInputFormat {
 
     private transient RestHighLevelClient client;
 
-    private Iterator<Map<String, Object>> iterator;
+    private Iterator<String> iterator;
 
     private transient SearchRequest searchRequest;
 
@@ -149,10 +150,10 @@ public class EsInputFormat extends BaseRichInputFormat {
             searchHits = searchResponse.getHits().getHits();
         }
 
-        List<Map<String, Object>> resultList = Lists.newArrayList();
+        List<String> resultList = Lists.newArrayList();
         for(SearchHit searchHit : searchHits) {
-            Map<String,Object> source = searchHit.getSourceAsMap();
-            resultList.add(source);
+        	resultList.add(searchHit.getSourceAsString());
+          
         }
 
         iterator = resultList.iterator();
@@ -160,8 +161,8 @@ public class EsInputFormat extends BaseRichInputFormat {
     }
 
     @Override
-    public Row nextRecordInternal(Row row) throws IOException {
-        return EsUtil.jsonMapToRow(iterator.next(), columnNames, columnTypes, columnValues);
+    public JSONObject nextRecordInternal(JSONObject row) throws IOException {
+    	return JSONObject.parseObject(iterator.next());
     }
 
     @Override

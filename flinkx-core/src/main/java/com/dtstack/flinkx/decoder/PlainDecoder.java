@@ -20,6 +20,8 @@ package com.dtstack.flinkx.decoder;
 import java.util.Collections;
 import java.util.Map;
 
+import com.alibaba.fastjson.JSONObject;
+
 /**
  * Date: 2019/11/21
  * Company: www.dtstack.com
@@ -29,8 +31,8 @@ import java.util.Map;
 public class PlainDecoder implements IDecode {
 
     @Override
-    public Map<String, Object> decode(final String message) {
-        return Collections.singletonMap("message", message);
+    public JSONObject decode(final String message) {
+        return JSONObject.parseObject(message);
     }
 
 }

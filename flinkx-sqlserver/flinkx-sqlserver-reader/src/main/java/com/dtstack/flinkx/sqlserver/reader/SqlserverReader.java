@@ -18,6 +18,7 @@
 
 package com.dtstack.flinkx.sqlserver.reader;
 
+import com.alibaba.fastjson.JSONObject;
 import com.dtstack.flinkx.config.DataTransferConfig;
 import com.dtstack.flinkx.config.ReaderConfig;
 import com.dtstack.flinkx.inputformat.BaseRichInputFormat;
@@ -57,7 +58,7 @@ public class SqlserverReader extends JdbcDataReader {
     }
 
     @Override
-    public DataStream<Row> readData() {
+    public DataStream<JSONObject> readData() {
         JdbcInputFormatBuilder builder = getBuilder();
         builder.setDriverName(databaseInterface.getDriverClass());
         builder.setDbUrl(dbUrl);

@@ -19,6 +19,7 @@
 
 package com.dtstack.flinkx.hdfs.reader;
 
+import com.alibaba.fastjson.JSONObject;
 import com.dtstack.flinkx.config.DataTransferConfig;
 import com.dtstack.flinkx.config.ReaderConfig;
 import com.dtstack.flinkx.hdfs.HdfsConfigKeys;
@@ -68,7 +69,7 @@ public class HdfsReader extends BaseDataReader {
     }
 
     @Override
-    public DataStream<Row> readData() {
+    public DataStream<JSONObject> readData() {
         HdfsInputFormatBuilder builder = new HdfsInputFormatBuilder(fileType);
         builder.setDataTransferConfig(dataTransferConfig);
         builder.setInputPaths(path);

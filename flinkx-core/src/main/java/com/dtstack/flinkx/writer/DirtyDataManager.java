@@ -18,6 +18,7 @@
 
 package com.dtstack.flinkx.writer;
 
+import com.alibaba.fastjson.JSONObject;
 import com.dtstack.flinkx.exception.WriteRecordException;
 import com.dtstack.flinkx.util.DateUtil;
 import com.dtstack.flinkx.util.FileSystemUtil;
@@ -80,8 +81,8 @@ public class DirtyDataManager {
         this.jobId = jobId;
     }
 
-    public String writeData(Row row, WriteRecordException ex) {
-        String content = RowUtil.rowToJson(row, fieldNames);
+    public String writeData(JSONObject row, WriteRecordException ex) {
+        String content = row.toJSONString();
         String errorType = retrieveCategory(ex);
         String line = StringUtils.join(new String[]{content,errorType, gson.toJson(ex.toString()), DateUtil.timestampToString(new Date()) }, FIELD_DELIMITER);
         try {

@@ -17,6 +17,7 @@
  */
 package com.dtstack.flinkx.emqx.writer;
 
+import com.alibaba.fastjson.JSONObject;
 import com.dtstack.flinkx.config.DataTransferConfig;
 import com.dtstack.flinkx.config.WriterConfig;
 import com.dtstack.flinkx.emqx.format.EmqxOutputFormatBuilder;
@@ -58,7 +59,7 @@ public class EmqxWriter extends BaseDataWriter {
     }
 
     @Override
-    public DataStreamSink<?> writeData(DataStream<Row> dataSet) {
+    public DataStreamSink<?> writeData(DataStream<JSONObject> dataSet) {
         EmqxOutputFormatBuilder builder = new EmqxOutputFormatBuilder();
         builder.setBroker(broker);
         builder.setTopic(topic);

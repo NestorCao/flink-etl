@@ -135,6 +135,12 @@
             <artifactId>simpleclient</artifactId>
             <version>0.5.0</version>
         </dependency>
+		<dependency>
+		    <groupId>com.alibaba</groupId>
+		    <artifactId>fastjson</artifactId>
+		    <version>1.2.75</version>
+		</dependency>
+        
     </dependencies>
 
     <build>

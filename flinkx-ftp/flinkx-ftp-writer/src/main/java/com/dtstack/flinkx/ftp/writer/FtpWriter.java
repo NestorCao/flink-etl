@@ -18,6 +18,7 @@
 
 package com.dtstack.flinkx.ftp.writer;
 
+import com.alibaba.fastjson.JSONObject;
 import com.dtstack.flinkx.config.DataTransferConfig;
 import com.dtstack.flinkx.config.WriterConfig;
 import com.dtstack.flinkx.ftp.FtpConfig;
@@ -76,7 +77,7 @@ public class FtpWriter extends BaseDataWriter {
     }
 
     @Override
-    public DataStreamSink<?> writeData(DataStream<Row> dataSet) {
+    public DataStreamSink<?> writeData(DataStream<JSONObject> dataSet) {
         FtpOutputFormatBuilder builder = new FtpOutputFormatBuilder();
         builder.setFtpConfig(ftpConfig);
         builder.setPath(ftpConfig.getPath());

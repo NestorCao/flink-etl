@@ -17,6 +17,7 @@
  */
 package com.dtstack.flinkx.odps.writer;
 
+import com.alibaba.fastjson.JSONObject;
 import com.dtstack.flinkx.config.DataTransferConfig;
 import com.dtstack.flinkx.config.WriterConfig;
 import com.dtstack.flinkx.odps.OdpsConfigKeys;
@@ -80,7 +81,7 @@ public class OdpsWriter extends BaseDataWriter {
     }
 
     @Override
-    public DataStreamSink<?> writeData(DataStream<Row> dataSet) {
+    public DataStreamSink<?> writeData(DataStream<JSONObject> dataSet) {
         OdpsOutputFormatBuilder builder = new OdpsOutputFormatBuilder();
 
         builder.setPartition(partition);

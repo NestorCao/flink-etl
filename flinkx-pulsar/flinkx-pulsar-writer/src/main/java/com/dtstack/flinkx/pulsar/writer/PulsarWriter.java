@@ -17,6 +17,7 @@
  */
 package com.dtstack.flinkx.pulsar.writer;
 
+import com.alibaba.fastjson.JSONObject;
 import com.dtstack.flinkx.config.DataTransferConfig;
 import com.dtstack.flinkx.writer.BaseDataWriter;
 import org.apache.flink.streaming.api.datastream.DataStream;
@@ -51,7 +52,7 @@ public class PulsarWriter extends BaseDataWriter {
     }
 
     @Override
-    public DataStreamSink<?> writeData(DataStream<Row> dataSet) {
+    public DataStreamSink<?> writeData(DataStream<JSONObject> dataSet) {
         PulsarOutputFormatBuilder builder = new PulsarOutputFormatBuilder();
         builder.setTopic(topic);
         builder.setPulsarServiceUrl(pulsarServiceUrl);

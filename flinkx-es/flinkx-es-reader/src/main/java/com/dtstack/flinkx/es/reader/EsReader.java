@@ -18,6 +18,7 @@
 
 package com.dtstack.flinkx.es.reader;
 
+import com.alibaba.fastjson.JSONObject;
 import com.dtstack.flinkx.config.DataTransferConfig;
 import com.dtstack.flinkx.config.ReaderConfig;
 import com.dtstack.flinkx.constants.ConstantValue;
@@ -102,7 +103,7 @@ public class EsReader extends BaseDataReader {
     }
 
     @Override
-    public DataStream<Row> readData() {
+    public DataStream<JSONObject> readData() {
         EsInputFormatBuilder builder = new EsInputFormatBuilder();
         builder.setDataTransferConfig(dataTransferConfig);
         builder.setColumnNames(columnName);

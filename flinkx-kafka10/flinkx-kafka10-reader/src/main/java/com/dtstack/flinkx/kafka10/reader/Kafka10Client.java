@@ -17,6 +17,7 @@
  */
 package com.dtstack.flinkx.kafka10.reader;
 
+import com.alibaba.fastjson.JSONObject;
 import com.dtstack.flinkx.decoder.IDecode;
 import com.dtstack.flinkx.kafkabase.reader.IClient;
 import com.dtstack.flinkx.kafkabase.reader.KafkaBaseInputFormat;
@@ -86,7 +87,7 @@ public class Kafka10Client implements IClient {
 
     @Override
     public void processMessage(String message) {
-        Map<String, Object> event = decode.decode(message);
+         JSONObject event = decode.decode(message);
         if (event != null && event.size() > 0) {
             format.processEvent(event);
         }

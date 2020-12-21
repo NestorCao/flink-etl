@@ -18,6 +18,7 @@
 
 package com.dtstack.flinkx.inputformat;
 
+import com.alibaba.fastjson.JSONObject;
 import com.dtstack.flinkx.config.DataTransferConfig;
 import com.dtstack.flinkx.config.LogConfig;
 import com.dtstack.flinkx.config.RestoreConfig;
@@ -37,7 +38,7 @@ import org.apache.flink.api.common.io.statistics.BaseStatistics;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.core.io.InputSplit;
 import org.apache.flink.core.io.InputSplitAssigner;
-import org.apache.flink.types.Row;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,7 +64,7 @@ import static com.dtstack.flinkx.constants.ConfigConstant.KEY_WRITER;
  *
  * @author jiangbo
  */
-public abstract class BaseRichInputFormat extends org.apache.flink.api.common.io.RichInputFormat<Row, InputSplit> {
+public abstract class BaseRichInputFormat extends org.apache.flink.api.common.io.RichInputFormat<JSONObject, InputSplit> {
 
     protected final Logger LOG = LoggerFactory.getLogger(getClass());
     protected String jobName = "defaultJobName";
@@ -275,11 +276,11 @@ public abstract class BaseRichInputFormat extends org.apache.flink.api.common.io
     }
 
     @Override
-    public Row nextRecord(Row row) throws IOException {
+    public JSONObject nextRecord(JSONObject row) throws IOException {
         if(byteRateLimiter != null) {
             byteRateLimiter.acquire();
         }
-        Row internalRow = nextRecordInternal(row);
+        JSONObject internalRow = nextRecordInternal(row);
         if(internalRow != null){
             internalRow = setChannelInformation(internalRow);
 
@@ -302,14 +303,9 @@ public abstract class BaseRichInputFormat extends org.apache.flink.api.common.io
         return internalRow;
     }
 
-    private Row setChannelInformation(Row internalRow){
-        Row rowWithChannel = new Row(internalRow.getArity() + 1);
-        for (int i = 0; i < internalRow.getArity(); i++) {
-            rowWithChannel.setField(i, internalRow.getField(i));
-        }
-
-        rowWithChannel.setField(internalRow.getArity(), indexOfSubTask);
-        return rowWithChannel;
+    private JSONObject setChannelInformation(JSONObject internalRow){
+    	internalRow.put("indexOfSubTask", indexOfSubTask);
+        return internalRow;
     }
 
     /**
@@ -330,7 +326,7 @@ public abstract class BaseRichInputFormat extends org.apache.flink.api.common.io
      * @return 读取的数据
      * @throws IOException 读取异常
      */
-    protected abstract Row nextRecordInternal(Row row) throws IOException;
+    protected abstract JSONObject nextRecordInternal(JSONObject row) throws IOException;
 
     @Override
     public void close() throws IOException {

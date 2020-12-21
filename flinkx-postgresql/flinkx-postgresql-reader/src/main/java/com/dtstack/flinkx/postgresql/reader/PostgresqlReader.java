@@ -18,6 +18,7 @@
 
 package com.dtstack.flinkx.postgresql.reader;
 
+import com.alibaba.fastjson.JSONObject;
 import com.dtstack.flinkx.config.DataTransferConfig;
 import com.dtstack.flinkx.inputformat.BaseRichInputFormat;
 import com.dtstack.flinkx.postgresql.PostgresqlDatabaseMeta;
@@ -52,7 +53,7 @@ public class PostgresqlReader extends JdbcDataReader {
     }
 
     @Override
-    public DataStream<Row> readData() {
+    public DataStream<JSONObject> readData() {
         JdbcInputFormatBuilder builder = new JdbcInputFormatBuilder(new PostgresqlInputFormat());
         builder.setDataTransferConfig(dataTransferConfig);
         builder.setDriverName(databaseInterface.getDriverClass());

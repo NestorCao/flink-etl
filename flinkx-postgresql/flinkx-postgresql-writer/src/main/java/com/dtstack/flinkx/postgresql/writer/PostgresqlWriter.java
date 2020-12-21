@@ -18,6 +18,7 @@
 
 package com.dtstack.flinkx.postgresql.writer;
 
+import com.alibaba.fastjson.JSONObject;
 import com.dtstack.flinkx.config.DataTransferConfig;
 import com.dtstack.flinkx.postgresql.PostgresqlDatabaseMeta;
 import com.dtstack.flinkx.postgresql.PostgresqlTypeConverter;
@@ -44,7 +45,7 @@ public class PostgresqlWriter extends JdbcDataWriter {
     }
 
     @Override
-    public DataStreamSink<?> writeData(DataStream<Row> dataSet) {
+    public DataStreamSink<?> writeData(DataStream<JSONObject> dataSet) {
         PostgresqlOutputFormat postgresqlOutputFormat = new PostgresqlOutputFormat();
         JdbcOutputFormatBuilder builder = new JdbcOutputFormatBuilder(postgresqlOutputFormat);
         builder.setDriverName(databaseInterface.getDriverClass());

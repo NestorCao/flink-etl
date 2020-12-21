@@ -18,6 +18,7 @@
 
 package com.dtstack.flinkx.stream.writer;
 
+import com.alibaba.fastjson.JSONObject;
 import com.dtstack.flinkx.config.DataTransferConfig;
 import com.dtstack.flinkx.reader.MetaColumn;
 import com.dtstack.flinkx.writer.BaseDataWriter;
@@ -53,7 +54,7 @@ public class StreamWriter extends BaseDataWriter {
     }
 
     @Override
-    public DataStreamSink<?> writeData(DataStream<Row> dataSet) {
+    public DataStreamSink<?> writeData(DataStream<JSONObject> dataSet) {
         StreamOutputFormatBuilder builder = new StreamOutputFormatBuilder();
         builder.setPrint(print);
         builder.setRestoreConfig(restoreConfig);

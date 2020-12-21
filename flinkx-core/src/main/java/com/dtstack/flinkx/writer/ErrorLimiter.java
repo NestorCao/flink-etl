@@ -18,6 +18,7 @@
 
 package com.dtstack.flinkx.writer;
 
+import com.alibaba.fastjson.JSONObject;
 import com.dtstack.flinkx.constants.Metrics;
 import com.dtstack.flinkx.metrics.AccumulatorCollector;
 import org.apache.flink.types.Row;
@@ -37,9 +38,9 @@ ErrorLimiter {
     private AccumulatorCollector accumulatorCollector;
     private volatile double errorRatio = 0.0;
     private String errMsg = "";
-    private Row errorData;
+    private JSONObject errorData;
 
-    public void setErrorData(Row errorData){
+    public void setErrorData(JSONObject errorData){
         this.errorData = errorData;
     }
 

@@ -18,6 +18,7 @@
 
 package com.dtstack.flinkx.es.writer;
 
+import com.alibaba.fastjson.JSONObject;
 import com.dtstack.flinkx.es.EsUtil;
 import com.dtstack.flinkx.exception.WriteRecordException;
 import com.dtstack.flinkx.util.StringUtil;
@@ -81,10 +82,9 @@ public class EsOutputFormat extends BaseRichOutputFormat {
     }
 
     @Override
-    protected void writeSingleRecordInternal(Row row) throws WriteRecordException {
-        String id = getId(row);
-        IndexRequest request = StringUtils.isBlank(id) ? new IndexRequest(index, type) : new IndexRequest(index, type, id);
-        request = request.source(EsUtil.rowToJsonMap(row, columnNames, columnTypes));
+    protected void writeSingleRecordInternal(JSONObject row) throws WriteRecordException {
+        IndexRequest request =  new IndexRequest(index, type);
+        request = request.source(row.toJSONString());
         try {
             client.index(request);
         } catch (Exception ex) {
@@ -95,10 +95,9 @@ public class EsOutputFormat extends BaseRichOutputFormat {
     @Override
     protected void writeMultipleRecordsInternal() throws Exception {
         bulkRequest = new BulkRequest();
-        for(Row row : rows) {
-            String id = getId(row);
-            IndexRequest request = StringUtils.isBlank(id) ? new IndexRequest(index, type) : new IndexRequest(index, type, id);
-            request = request.source(EsUtil.rowToJsonMap(row, columnNames, columnTypes));
+        for(JSONObject row : rows) {
+            IndexRequest request =  new IndexRequest(index, type);
+            request = request.source(row.toJSONString());
             bulkRequest.add(request);
         }
 

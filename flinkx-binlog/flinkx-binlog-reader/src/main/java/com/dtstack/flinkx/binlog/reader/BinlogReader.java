@@ -17,6 +17,7 @@
  */
 package com.dtstack.flinkx.binlog.reader;
 
+import com.alibaba.fastjson.JSONObject;
 import com.dtstack.flinkx.config.DataTransferConfig;
 import com.dtstack.flinkx.config.ReaderConfig;
 import com.dtstack.flinkx.reader.BaseDataReader;
@@ -46,7 +47,7 @@ public class BinlogReader extends BaseDataReader {
     }
 
     @Override
-    public DataStream<Row> readData() {
+    public DataStream<JSONObject> readData() {
         BinlogInputFormat format = new BinlogInputFormat();
         format.setDataTransferConfig(dataTransferConfig);
         format.setBinlogConfig(binlogConfig);

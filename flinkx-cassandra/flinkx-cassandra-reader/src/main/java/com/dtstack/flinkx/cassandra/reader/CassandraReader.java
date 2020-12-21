@@ -18,6 +18,7 @@
 
 package com.dtstack.flinkx.cassandra.reader;
 
+import com.alibaba.fastjson.JSONObject;
 import com.dtstack.flinkx.config.DataTransferConfig;
 import com.dtstack.flinkx.config.ReaderConfig;
 import com.dtstack.flinkx.reader.BaseDataReader;
@@ -104,7 +105,7 @@ public class CassandraReader extends BaseDataReader {
     }
 
     @Override
-    public DataStream<Row> readData() {
+    public DataStream<JSONObject> readData() {
         CassandraInputFormatBuilder builder = new CassandraInputFormatBuilder();
         builder.setDataTransferConfig(dataTransferConfig);
         builder.setTable(table);

@@ -19,6 +19,7 @@
 
 package com.dtstack.flinkx.hbase.writer;
 
+import com.alibaba.fastjson.JSONObject;
 import com.dtstack.flinkx.config.DataTransferConfig;
 import com.dtstack.flinkx.config.WriterConfig;
 import com.dtstack.flinkx.util.ValueUtil;
@@ -138,7 +139,7 @@ public class HbaseWriter extends BaseDataWriter {
     }
 
     @Override
-    public DataStreamSink<?> writeData(DataStream<Row> dataSet) {
+    public DataStreamSink<?> writeData(DataStream<JSONObject> dataSet) {
         HbaseOutputFormatBuilder builder = new HbaseOutputFormatBuilder();
         builder.setHbaseConfig(hbaseConfig);
         builder.setTableName(tableName);

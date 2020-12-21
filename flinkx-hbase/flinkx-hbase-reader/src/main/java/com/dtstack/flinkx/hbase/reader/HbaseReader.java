@@ -18,6 +18,7 @@
 
 package com.dtstack.flinkx.hbase.reader;
 
+import com.alibaba.fastjson.JSONObject;
 import com.dtstack.flinkx.config.DataTransferConfig;
 import com.dtstack.flinkx.config.ReaderConfig;
 import com.dtstack.flinkx.hbase.HbaseConfigConstants;
@@ -94,7 +95,7 @@ public class HbaseReader extends BaseDataReader {
     }
 
     @Override
-    public DataStream<Row> readData() {
+    public DataStream<JSONObject> readData() {
         HbaseInputFormatBuilder builder = new HbaseInputFormatBuilder();
         builder.setDataTransferConfig(dataTransferConfig);
         builder.setColumnFormats(columnFormat);

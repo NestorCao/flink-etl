@@ -17,6 +17,7 @@
  */
 package com.dtstack.flinkx.kafka09.writer;
 
+import com.alibaba.fastjson.JSONObject;
 import com.dtstack.flinkx.config.DataTransferConfig;
 import com.dtstack.flinkx.config.WriterConfig;
 import com.dtstack.flinkx.kafkabase.KafkaConfigKeys;
@@ -49,7 +50,7 @@ public class Kafka09Writer extends KafkaBaseWriter {
     }
 
     @Override
-    public DataStreamSink<?> writeData(DataStream<Row> dataSet) {
+    public DataStreamSink<?> writeData(DataStream<JSONObject> dataSet) {
         Kafka09OutputFormat format = new Kafka09OutputFormat();
         format.setTimezone(timezone);
         format.setEncoding(encoding);

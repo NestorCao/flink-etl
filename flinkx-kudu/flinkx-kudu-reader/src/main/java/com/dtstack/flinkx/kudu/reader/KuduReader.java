@@ -19,6 +19,7 @@
 
 package com.dtstack.flinkx.kudu.reader;
 
+import com.alibaba.fastjson.JSONObject;
 import com.dtstack.flinkx.config.DataTransferConfig;
 import com.dtstack.flinkx.config.ReaderConfig;
 import com.dtstack.flinkx.kudu.core.KuduConfig;
@@ -81,7 +82,7 @@ public class KuduReader extends BaseDataReader {
     }
 
     @Override
-    public DataStream<Row> readData() {
+    public DataStream<JSONObject> readData() {
         KuduInputFormatBuilder builder = new KuduInputFormatBuilder();
         builder.setDataTransferConfig(dataTransferConfig);
         builder.setColumns(columns);

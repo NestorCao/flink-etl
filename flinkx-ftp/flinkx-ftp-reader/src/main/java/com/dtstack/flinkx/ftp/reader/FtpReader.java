@@ -18,6 +18,7 @@
 
 package com.dtstack.flinkx.ftp.reader;
 
+import com.alibaba.fastjson.JSONObject;
 import com.dtstack.flinkx.config.DataTransferConfig;
 import com.dtstack.flinkx.config.ReaderConfig;
 import com.dtstack.flinkx.ftp.FtpConfig;
@@ -66,7 +67,7 @@ public class FtpReader extends BaseDataReader {
     }
 
     @Override
-    public DataStream<Row> readData() {
+    public DataStream<JSONObject> readData() {
         FtpInputFormatBuilder builder = new FtpInputFormatBuilder();
         builder.setDataTransferConfig(dataTransferConfig);
         builder.setFtpConfig(ftpConfig);

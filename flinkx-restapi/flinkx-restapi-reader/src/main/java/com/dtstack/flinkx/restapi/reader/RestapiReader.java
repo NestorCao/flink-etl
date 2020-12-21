@@ -17,6 +17,7 @@
  */
 package com.dtstack.flinkx.restapi.reader;
 
+import com.alibaba.fastjson.JSONObject;
 import com.dtstack.flinkx.config.DataTransferConfig;
 import com.dtstack.flinkx.config.ReaderConfig;
 import com.dtstack.flinkx.reader.BaseDataReader;
@@ -59,7 +60,7 @@ public class RestapiReader extends BaseDataReader {
     }
 
     @Override
-    public DataStream<Row> readData() {
+    public DataStream<JSONObject> readData() {
         RestapiInputFormatBuilder builder = new RestapiInputFormatBuilder();
         builder.setDataTransferConfig(dataTransferConfig);
         builder.setHeader(header);

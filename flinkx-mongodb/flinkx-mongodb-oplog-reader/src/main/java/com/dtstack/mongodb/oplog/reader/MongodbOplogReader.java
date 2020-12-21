@@ -19,6 +19,7 @@
 
 package com.dtstack.mongodb.oplog.reader;
 
+import com.alibaba.fastjson.JSONObject;
 import com.dtstack.flinkx.config.DataTransferConfig;
 import com.dtstack.flinkx.config.ReaderConfig;
 import com.dtstack.flinkx.mongodb.MongodbConfig;
@@ -47,7 +48,7 @@ public class MongodbOplogReader extends BaseDataReader {
     }
 
     @Override
-    public DataStream<Row> readData() {
+    public DataStream<JSONObject> readData() {
         MongodbOplogInputFormatBuilder builder = new MongodbOplogInputFormatBuilder();
         builder.setMonitorUrls(monitorUrls);
         builder.setBytes(bytes);

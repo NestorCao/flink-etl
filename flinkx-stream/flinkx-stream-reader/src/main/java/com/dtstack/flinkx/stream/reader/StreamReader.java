@@ -18,6 +18,7 @@
 
 package com.dtstack.flinkx.stream.reader;
 
+import com.alibaba.fastjson.JSONObject;
 import com.dtstack.flinkx.config.DataTransferConfig;
 import com.dtstack.flinkx.config.ReaderConfig;
 import com.dtstack.flinkx.reader.BaseDataReader;
@@ -59,7 +60,7 @@ public class StreamReader extends BaseDataReader {
     }
 
     @Override
-    public DataStream<Row> readData() {
+    public DataStream<JSONObject> readData() {
         StreamInputFormatBuilder builder = new StreamInputFormatBuilder();
         builder.setDataTransferConfig(dataTransferConfig);
         builder.setColumns(columns);

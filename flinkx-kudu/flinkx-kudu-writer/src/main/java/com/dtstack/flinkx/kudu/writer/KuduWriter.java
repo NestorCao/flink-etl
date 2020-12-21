@@ -19,6 +19,7 @@
 
 package com.dtstack.flinkx.kudu.writer;
 
+import com.alibaba.fastjson.JSONObject;
 import com.dtstack.flinkx.config.DataTransferConfig;
 import com.dtstack.flinkx.config.WriterConfig;
 import com.dtstack.flinkx.kudu.core.KuduConfig;
@@ -80,7 +81,7 @@ public class KuduWriter extends BaseDataWriter {
     }
 
     @Override
-    public DataStreamSink<?> writeData(DataStream<Row> dataSet) {
+    public DataStreamSink<?> writeData(DataStream<JSONObject> dataSet) {
         KuduOutputFormatBuilder builder = new KuduOutputFormatBuilder();
         builder.setMonitorUrls(monitorUrls);
         builder.setColumns(columns);
