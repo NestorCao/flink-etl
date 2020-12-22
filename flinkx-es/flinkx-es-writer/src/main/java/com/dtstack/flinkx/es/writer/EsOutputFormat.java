@@ -31,6 +31,8 @@ import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.common.xcontent.XContentType;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -84,7 +86,7 @@ public class EsOutputFormat extends BaseRichOutputFormat {
     @Override
     protected void writeSingleRecordInternal(JSONObject row) throws WriteRecordException {
         IndexRequest request =  new IndexRequest(index, type);
-        request = request.source(row.toJSONString());
+        request = request.source(row.toJSONString(),XContentType.JSON);
         try {
             client.index(request);
         } catch (Exception ex) {
@@ -97,7 +99,7 @@ public class EsOutputFormat extends BaseRichOutputFormat {
         bulkRequest = new BulkRequest();
         for(JSONObject row : rows) {
             IndexRequest request =  new IndexRequest(index, type);
-            request = request.source(row.toJSONString());
+            request = request.source(row.toJSONString(),XContentType.JSON);
             bulkRequest.add(request);
         }
 

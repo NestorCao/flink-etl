@@ -445,9 +445,9 @@ public abstract class BaseRichOutputFormat extends org.apache.flink.api.common.i
             writeSingleRecord(row);
         } else {
             rows.add(row);
-            if(rows.size() == batchInterval) {
+         //   if(rows.size() == batchInterval) {
                 writeRecordInternal();
-            }
+          //  }
         }
 
         updateDuration();
