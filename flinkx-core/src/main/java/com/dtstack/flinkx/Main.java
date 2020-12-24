@@ -29,6 +29,8 @@ import com.dtstack.flinkx.constants.ConfigConstant;
 import com.dtstack.flinkx.options.OptionParser;
 import com.dtstack.flinkx.reader.BaseDataReader;
 import com.dtstack.flinkx.reader.DataReaderFactory;
+import com.dtstack.flinkx.step.BaseStep;
+import com.dtstack.flinkx.step.StepFactory;
 import com.dtstack.flinkx.util.ResultPrintUtil;
 import com.dtstack.flinkx.writer.BaseDataWriter;
 import com.dtstack.flinkx.writer.DataWriterFactory;
@@ -55,6 +57,7 @@ import org.slf4j.LoggerFactory;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -131,7 +134,11 @@ public class Main {
         if (speedConfig.isRebalance()) {
             dataStream = dataStream.rebalance();
         }
-
+        List<BaseStep> steps = StepFactory.getSteps(config);
+        for(BaseStep step : steps) {
+        	dataStream = step.run(dataStream);
+        }
+        
         BaseDataWriter dataWriter = DataWriterFactory.getDataWriter(config);
         DataStreamSink<?> dataStreamSink = dataWriter.writeData(dataStream);
 
