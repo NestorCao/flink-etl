@@ -26,11 +26,17 @@ import com.dtstack.flinkx.outputformat.BaseRichOutputFormat;
 import org.apache.commons.lang.StringUtils;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.types.Row;
+import org.elasticsearch.action.DocWriteRequest;
+import org.elasticsearch.action.bulk.BackoffPolicy;
 import org.elasticsearch.action.bulk.BulkItemResponse;
+import org.elasticsearch.action.bulk.BulkProcessor;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.common.unit.ByteSizeUnit;
+import org.elasticsearch.common.unit.ByteSizeValue;
+import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.common.xcontent.XContentType;
 
 import java.io.IOException;
@@ -43,6 +49,7 @@ import java.util.Map;
  * Company: www.dtstack.com
  * @author huyifan.zju@163.com
  */
+
 public class EsOutputFormat extends BaseRichOutputFormat {
 
     protected String address;
@@ -66,17 +73,51 @@ public class EsOutputFormat extends BaseRichOutputFormat {
     protected List<String> columnNames;
 
     protected Map<String,Object> clientConfig;
-
+    protected Integer bulkAction;
+    protected Integer timeOut;
     private transient RestHighLevelClient client;
-
-    private transient BulkRequest bulkRequest;
-
+    
+    private BulkProcessor bulkProcessor;
 
     @Override
     public void configure(Configuration configuration) {
         client = EsUtil.getClient(address, username, password, clientConfig);
-        bulkRequest = new BulkRequest();
-    }
+        BulkProcessor.Listener listener = new BulkProcessor.Listener() {
+            @Override
+            public void beforeBulk(long executionId, BulkRequest request) {
+                int numberOfActions = request.numberOfActions(); 
+                LOG.debug("Executing bulk [{}] with {} requests",
+                        executionId, numberOfActions);
+            }
+
+            @Override
+            public void afterBulk(long executionId, BulkRequest request,
+                    BulkResponse response) {
+                if (response.hasFailures()) { 
+                    LOG.warn("Bulk [{}] executed with failures", executionId); 
+                    //待补充，需要将入库失败的记录打印至日志中
+                    
+                } else {
+                	LOG.debug("Bulk [{}] completed in {} milliseconds",
+                            executionId, response.getTook().getMillis());
+                }
+            }
+
+            @Override
+            public void afterBulk(long executionId, BulkRequest request,
+                    Throwable failure) {
+            	LOG.error("Failed to execute bulk", failure); 
+            }
+        };
+
+        BulkProcessor.Builder builder = BulkProcessor.builder(client::bulkAsync, listener);
+        builder.setBulkActions(bulkAction);
+        builder.setBulkSize(new ByteSizeValue(1L, ByteSizeUnit.MB)); 
+        builder.setConcurrentRequests(1); 
+        builder.setFlushInterval(TimeValue.timeValueSeconds(timeOut)); 
+        builder.setBackoffPolicy(BackoffPolicy.constantBackoff(TimeValue.timeValueSeconds(1L), 3)); 
+        bulkProcessor = builder.build();
+        }
 
     @Override
     public void openInternal(int taskNumber, int numTasks) throws IOException {
@@ -85,46 +126,15 @@ public class EsOutputFormat extends BaseRichOutputFormat {
 
     @Override
     protected void writeSingleRecordInternal(JSONObject row) throws WriteRecordException {
-        IndexRequest request =  new IndexRequest(index, type);
-        request = request.source(row.toJSONString(),XContentType.JSON);
-        try {
-            client.index(request);
-        } catch (Exception ex) {
-            throw new WriteRecordException(ex.getMessage(), ex);
-        }
+    	   IndexRequest request =  new IndexRequest(index, type);
+           request = request.source(row.toJSONString(),XContentType.JSON);
+           bulkProcessor.add(request);
+       
     }
 
     @Override
-    protected void writeMultipleRecordsInternal() throws Exception {
-        bulkRequest = new BulkRequest();
-        for(JSONObject row : rows) {
-            IndexRequest request =  new IndexRequest(index, type);
-            request = request.source(row.toJSONString(),XContentType.JSON);
-            bulkRequest.add(request);
-        }
-
-        BulkResponse response = client.bulk(bulkRequest);
-        if (response.hasFailures()){
-            processFailResponse(response);
-        }
-    }
-
-    private void processFailResponse(BulkResponse response){
-        BulkItemResponse[] itemResponses = response.getItems();
-        WriteRecordException exception;
-        for (int i = 0; i < itemResponses.length; i++) {
-            if(itemResponses[i].isFailed()){
-                if (dirtyDataManager != null){
-                    exception = new WriteRecordException(itemResponses[i].getFailureMessage()
-                            ,itemResponses[i].getFailure().getCause());
-                    dirtyDataManager.writeData(rows.get(i), exception);
-                }
-
-                if (errCounter != null) {
-                    errCounter.add(1);
-                }
-            }
-        }
+    protected void writeMultipleRecordsInternal() {
+        notSupportBatchWrite("ElasticsearchWriter");
     }
 
     @Override
@@ -135,29 +145,6 @@ public class EsOutputFormat extends BaseRichOutputFormat {
     }
 
 
-    private String getId(Row record) throws WriteRecordException {
-        if(idColumnIndices == null || idColumnIndices.size() == 0) {
-            return null;
-        }
-        StringBuilder sb = new StringBuilder();
-        int i = 0;
-        try {
-            for(; i < idColumnIndices.size(); ++i) {
-                Integer index = idColumnIndices.get(i);
-                String type =  idColumnTypes.get(i);
-                if(index == -1) {
-                    String value = idColumnValues.get(i);
-                    sb.append(value);
-                } else {
-                    sb.append(StringUtil.col2string(record.getField(index), type));
-                }
-            }
-        } catch(Exception ex) {
-            String msg = getClass().getName() + " Writing record error: when converting field[" + i + "] in Row(" + record + ")";
-            throw new WriteRecordException(msg, ex, i, record);
-        }
-
-        return sb.toString();
-    }
+    
 
 }

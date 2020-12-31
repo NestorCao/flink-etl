@@ -1,16 +1,17 @@
 package com.dtstack.flinkx.step;
-
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.util.Collector;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.dtstack.flinkx.config.StepConfig;
 import com.dtstack.flinkx.exception.FieldLengthErrorException;
@@ -19,9 +20,10 @@ import com.dtstack.flinkx.exception.FieldNotMatchesException;
 import com.esotericsoftware.minlog.Log; 
 
 public class ConvertionStep extends BaseStep{
+     private static Logger verifyLogger = LoggerFactory.getLogger("verifyLogger");
 	 private JSONObject convertionRule;
 	 public ConvertionStep(StepConfig stepConfig) {
-		 convertionRule = new JSONObject((HashMap)stepConfig.getParameter().getVal("rule"));	
+		 convertionRule = new JSONObject((Map)stepConfig.getParameter().getVal("rule"));	
 		     
 	}   
 	 @Override
@@ -30,24 +32,25 @@ public class ConvertionStep extends BaseStep{
 			return dataStream.flatMap(new FlatMapFunction<JSONObject, JSONObject>() {
 				  	@Override
 					public void flatMap(JSONObject origin, Collector<JSONObject> out) throws Exception {
-							        convertion(origin, localConvertionRule);
-							        JSONObject result = (JSONObject) origin.clone();
-							        moveField(origin,localConvertionRule,result,result);  
+				  		            JSONObject result = (JSONObject) origin.clone();
+				                    convertion(origin, localConvertionRule,result);
+							        moveField((JSONObject) result.clone(),localConvertionRule,result,result);  
 					                out.collect(result);             
 				  	}
 					 
-					 private void convertion(JSONObject origin, JSONObject convertionRule) throws Exception {
+					 private void convertion(JSONObject origin, JSONObject convertionRule,JSONObject result) throws Exception {
 				             Set<String> keySet = convertionRule.keySet();
 							 for(String field : keySet) {
 								JSONObject fieldRule = convertionRule.getJSONObject(field);
-								Object fieldVal = origin.get(field);
+								Object fieldVal = result.get(field);
 								
 								//字段是否为空检验
 								Boolean required = fieldRule.getBoolean("required");
 								if(required !=null && required == true ) {
 									if(fieldVal == null || (fieldVal instanceof String && fieldVal.equals(""))){
-										  throw new FieldNotExistException(
-								                    "字段不存在异常: field " + field + " is required", field);
+								    	verifyLogger.error("【未校验通过:字段{}要求必填】>>>>>{}",field, origin.toJSONString());
+								         
+										//throw new FieldNotExistException("字段不存在异常: field " + field + " is required", field);
 									}
 								}
 								//字段长度检验
@@ -55,12 +58,11 @@ public class ConvertionStep extends BaseStep{
 								if(length !=null && fieldVal != null) {
 										String str = String.valueOf(fieldVal);
 									    if(str.length() > length) {
-											  throw new FieldLengthErrorException( "字段长度超出限制: field " + field +"的最大长度为"+length , field);
-										    	
+									    	verifyLogger.error("【未校验通过:字段{}长度超出最大长度限制】>>>>>{}",field, origin.toJSONString());
+										     
+									    	//throw new FieldLengthErrorException( "字段长度超出限制: field " + field +"的最大长度为"+length , field);
 									    }
-										
-									
-								}
+							    }
 								//日期格式校验
 								String dateFormat = fieldRule.getString("dateFormat");
 								if(dateFormat !=null && fieldVal != null) {
@@ -68,7 +70,8 @@ public class ConvertionStep extends BaseStep{
 						                try {
 								          sdf.parse(String.valueOf(fieldVal));
 						                }catch(Exception e) {
-						                	  throw new FieldNotMatchesException("日期字段: field " + field +"的格式不符合要求 ", field);
+						                	verifyLogger.error("【未校验通过:日期字段{}格式不符合要求】>>>>>{}",field, origin.toJSONString());
+											//throw new FieldNotMatchesException("日期字段: field " + field +"的格式不符合要求 ", field);
 										
 						                }
 										
@@ -82,7 +85,7 @@ public class ConvertionStep extends BaseStep{
 								              
 								        	Date srcDate = sdf.parse(String.valueOf(fieldVal));
 								            sdf = new SimpleDateFormat(dateFormatTo);
-								            origin.put(field, sdf.format(srcDate));
+								            result.put(field, sdf.format(srcDate));
 						                }catch(Exception e) {
 						                	 Log.error(e.getMessage());
 						                }
@@ -94,7 +97,8 @@ public class ConvertionStep extends BaseStep{
 								if(valueMapper !=null && fieldVal != null ) {
 								        	Object newVal = valueMapper.get(fieldVal);
 								        	if(newVal!=null) {
-								        		origin.put(field, newVal);
+								        		result.put(field, newVal);
+								        		fieldVal = result.get(field);
 								        	}
 						            	
 									}
@@ -106,7 +110,7 @@ public class ConvertionStep extends BaseStep{
 							        		for(Entry<String, String> entry : set) {
 							        			if(fieldVal.toString().contains(entry.getKey())){
 							        				String newVal = fieldVal.toString().replace(entry.getKey(), entry.getValue());
-							        				origin.put(field, newVal); 
+							        				result.put(field, newVal); 
 							        				break;
 							        			}
 							        		}
@@ -116,19 +120,19 @@ public class ConvertionStep extends BaseStep{
 								//字段名转化             
 								String rename = fieldRule.getString("rename");
 								if(rename !=null && fieldVal != null) {
-									origin.put(rename, fieldVal);
-									origin.remove(field);
+									result.put(rename, fieldVal);
+									result.remove(field);
 								} 
 								//字段拷贝             
 								String copyTo = fieldRule.getString("copyTo");
 								if(copyTo !=null && fieldVal != null) {
-									origin.put(copyTo, fieldVal);
+									result.put(copyTo, fieldVal);
 								} 
 								
 							   //遍历下一级JSON对象
 								JSONObject properties = fieldRule.getJSONObject("properties");
 								 if(properties!=null) {
-							    	 convertion(origin.getJSONObject(field),properties);
+							    	 convertion(origin,properties,result.getJSONObject(field));
 							     }
 							 }
 				}

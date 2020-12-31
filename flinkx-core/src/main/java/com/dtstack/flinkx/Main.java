@@ -203,7 +203,7 @@ public class Main {
     private static boolean needRestart(DataTransferConfig config){
         return config.getJob().getSetting().getRestoreConfig().isStream();
     }
-
+ 
     private static void speedTest(DataTransferConfig config) {
         TestConfig testConfig = config.getJob().getSetting().getTestConfig();
         if (READER.equalsIgnoreCase(testConfig.getSpeedTest())) {

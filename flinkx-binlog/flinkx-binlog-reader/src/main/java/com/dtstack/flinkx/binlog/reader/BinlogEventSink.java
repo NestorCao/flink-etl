@@ -17,6 +17,7 @@
  */
 package com.dtstack.flinkx.binlog.reader;
 
+import com.alibaba.fastjson.JSONObject;
 import com.alibaba.otter.canal.common.AbstractCanalLifeCycle;
 import com.alibaba.otter.canal.protocol.CanalEntry;
 import com.alibaba.otter.canal.sink.exception.CanalSinkException;
@@ -149,14 +150,15 @@ public class BinlogEventSink extends AbstractCanalLifeCycle implements com.aliba
     }
 
     public Row takeEvent() throws IOException {
-        Row row = null;
+        JSONObject row = null;
         try {
             Map<String, Object> map = queue.take();
             //@see com.dtstack.flinkx.binlog.reader.HeartBeatController.onFailed 检测到异常之后 会添加key为e的错误数据
             if(map.size() == 1 && map.containsKey("e")){
                 throw new RuntimeException((String) map.get("e"));
             }else{
-                row = Row.of(map);
+                row = new JSONObject(map);
+               
             }
         } catch (InterruptedException e) {
             LOG.error("takeEvent interrupted error:{}", ExceptionUtil.getErrorMessage(e));

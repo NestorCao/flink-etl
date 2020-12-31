@@ -282,7 +282,7 @@ public abstract class BaseRichInputFormat extends org.apache.flink.api.common.io
         }
         JSONObject internalRow = nextRecordInternal(row);
         if(internalRow != null){
-            internalRow = setChannelInformation(internalRow);
+            //internalRow = setChannelInformation(internalRow);
 
             updateDuration();
             if(numReadCounter !=null ){
@@ -303,10 +303,10 @@ public abstract class BaseRichInputFormat extends org.apache.flink.api.common.io
         return internalRow;
     }
 
-    private JSONObject setChannelInformation(JSONObject internalRow){
-    	internalRow.put("indexOfSubTask", indexOfSubTask);
-        return internalRow;
-    }
+	/*
+	 * private JSONObject setChannelInformation(JSONObject internalRow){
+	 * internalRow.put("indexOfSubTask", indexOfSubTask); return internalRow; }
+	 */
 
     /**
      * Get the recover point of current channel

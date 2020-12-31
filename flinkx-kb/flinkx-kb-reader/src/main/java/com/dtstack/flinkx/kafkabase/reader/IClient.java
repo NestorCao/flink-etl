@@ -35,7 +35,7 @@ public interface IClient extends Runnable {
      *
      * @param message 待处理的消息
      */
-    void processMessage(String message);
+    void processMessage(String topic,String message);
 
     /**
      * 关闭连接

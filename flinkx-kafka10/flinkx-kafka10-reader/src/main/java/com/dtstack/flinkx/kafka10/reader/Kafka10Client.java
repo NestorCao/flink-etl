@@ -42,6 +42,7 @@ import java.util.Properties;
  */
 public class Kafka10Client implements IClient {
     protected static Logger LOG = LoggerFactory.getLogger(Kafka10Client.class);
+    private Logger alldataLogger = LoggerFactory.getLogger("dataLogger");
     private volatile boolean running = true;
     private long pollTimeout;
     private boolean blankIgnore;
@@ -70,7 +71,7 @@ public class Kafka10Client implements IClient {
                     }
 
                     try {
-                        processMessage(r.value());
+                        processMessage(r.topic(),r.value());
                     } catch (Throwable e) {
                         LOG.error("kafka consumer fetch is error, message = {}, e = {}", r.value(), ExceptionUtil.getErrorMessage(e));
                     }
@@ -86,9 +87,11 @@ public class Kafka10Client implements IClient {
     }
 
     @Override
-    public void processMessage(String message) {
+    public void processMessage(String topic,String message) {
+    	 alldataLogger.info("{}>>>>>{}", topic, message);
          JSONObject event = decode.decode(message);
-        if (event != null && event.size() > 0) {
+         event.put("_topic", topic);
+         if (event != null && event.size() > 0) {
             format.processEvent(event);
         }
     }

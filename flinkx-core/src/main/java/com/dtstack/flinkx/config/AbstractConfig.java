@@ -24,6 +24,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -76,7 +77,7 @@ public abstract class AbstractConfig implements Serializable {
         Object obj = internalMap.get(key);
         if (obj instanceof LinkedTreeMap) {
             LinkedTreeMap treeMap = (LinkedTreeMap) obj;
-            Map<String, Object> map = new HashMap<>(Math.max((int) (treeMap.size()/.75f) + 1, 16));
+            Map<String, Object> map = new LinkedHashMap<>(Math.max((int) (treeMap.size()/.75f) + 1, 16));
             map.putAll(treeMap);
             return map;
         }

@@ -40,7 +40,15 @@ public class EsOutputFormatBuilder extends BaseRichOutputFormatBuilder {
         format.address = address;
     }
 
+    public void setBulkAction(Integer bulkAction) {
+        format.bulkAction = bulkAction;
+    }
 
+    public void setTimeOut(Integer timeOut) {
+        format.timeOut = timeOut;
+    }
+
+      
     public void setUsername(String username) {
         format.username = username;
     }
@@ -81,6 +89,7 @@ public class EsOutputFormatBuilder extends BaseRichOutputFormatBuilder {
         format.clientConfig = clientConfig;
         return this;
     }
+    
 
     @Override
     protected void checkFormat() {

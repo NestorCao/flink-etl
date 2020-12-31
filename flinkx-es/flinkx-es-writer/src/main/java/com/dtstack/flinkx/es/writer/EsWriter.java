@@ -41,13 +41,15 @@ import java.util.Map;
 public class EsWriter extends BaseDataWriter {
 
     public static final int DEFAULT_BULK_ACTION = 100;
+    public static final int DEFAULT_TIME_OUT = 2;
 
     private String address;
     private String username;
     private String password;
     private String index;
     private String type;
-    private int bulkAction;
+    private Integer bulkAction;
+    private Integer timeOut;
     private Map<String,Object> clientConfig;
     private List<String> columnTypes;
     private List<String> columnNames;
@@ -64,6 +66,7 @@ public class EsWriter extends BaseDataWriter {
         type = writerConfig.getParameter().getStringVal(EsConfigKeys.KEY_TYPE);
         index = writerConfig.getParameter().getStringVal(EsConfigKeys.KEY_INDEX);
         bulkAction = writerConfig.getParameter().getIntVal(EsConfigKeys.KEY_BULK_ACTION, DEFAULT_BULK_ACTION);
+        timeOut = writerConfig.getParameter().getIntVal(EsConfigKeys.KEY_TIMEOUT,DEFAULT_TIME_OUT);
 
         clientConfig = new HashMap<>();
         clientConfig.put(EsConfigKeys.KEY_TIMEOUT, writerConfig.getParameter().getVal(EsConfigKeys.KEY_TIMEOUT));
@@ -115,7 +118,8 @@ public class EsWriter extends BaseDataWriter {
         builder.setPassword(password);
         builder.setIndex(index);
         builder.setType(type);
-        builder.setBatchInterval(bulkAction);
+        builder.setBulkAction(bulkAction);
+        builder.setTimeOut(timeOut);
         builder.setClientConfig(clientConfig);
         builder.setColumnNames(columnNames);
         builder.setColumnTypes(columnTypes);
